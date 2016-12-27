@@ -14,6 +14,7 @@
 			max-width: 540px;
 			margin: 0 auto;
 			background: #bfe6f5;
+			height: 1000px;
 		}
 		.tab{
 			position: relative;
@@ -100,15 +101,16 @@
 		var tabs = document.getElementsByTagName("ul")[0];
 		var content = document.getElementsByClassName("content")[0];
 		var line = document.getElementsByClassName("u-line")[0];
- 
+ 		
 		content.addEventListener("touchstart",  startTouchScroll, false);
 		content.addEventListener("touchmove", moveTouchScroll, false);
 		content.addEventListener("touchend",  endTouchScroll, false);
 		var startY, endY, startX, endX;
 		var activeTab = 0; //默认第一个是激活的tab
+		var isValid; //判断此次的滑动是否为水平滑动
 
 		function startTouchScroll(event)
-		{
+		{  
 	        var touch = event.touches[0];
 	        startX = touch.pageX;
 	        startY = touch.pageY;
@@ -116,34 +118,56 @@
 
 		function moveTouchScroll(event)
 		{
+			
 	        var touch = event.touches[0];
 	        endX = touch.pageX;
-	        endY = touch.pageY; 
-	        var distance = endX - startX;  
-	        if( activeTab == 0 && distance <0 && distance> -1*document.documentElement.clientWidth/2) {  
-		        	line.style.left = -1*distance + 'px'; 
-		        	content.children[0].style.left = 2*distance + 'px';
-		        	content.children[1].style.left = document.documentElement.clientWidth + 2*distance + 'px';  
-	        	 
-	        }
-	        else if( activeTab == 1 && distance > 0 && distance <document.documentElement.clientWidth/2){ 
-	        	line.style.left =  document.documentElement.clientWidth/2-1*distance + 'px';  
-	        	content.children[0].style.left = -document.documentElement.clientWidth + 2*distance + 'px';
-	        	content.children[1].style.left = 2*distance + 'px'; 
-	        }
+	        endY = touch.pageY;  
 
-	        line.className = 'u-line'; 
-	        content.children[0].className = "";
-	        content.children[1].className = "";
+	        if(isValid == undefined){ 
+		        //滑动过程中只判断一次
+		        if( Math.abs((endY - startY)/(endX - startX)) > 1){
+		        	isValid = false; 
+		        }else{
+		        	isValid = true;  
+		        }
+	        } 
+
+	        if( isValid ){
+	        	event.preventDefault();
+		        
+		        var distance = endX - startX;  
+		        console.log(distance);
+		        if( activeTab == 0 && distance <0 && distance> -1*document.documentElement.clientWidth/2) {  
+			        	line.style.left = -1*distance + 'px'; 
+			        	content.children[0].style.left = 2*distance + 'px';
+			        	content.children[1].style.left = document.documentElement.clientWidth + 2*distance + 'px';  
+		        	 
+		        }
+		        else if( activeTab == 1 && distance > 0 && distance <document.documentElement.clientWidth/2){ 
+		        	line.style.left =  document.documentElement.clientWidth/2-1*distance + 'px';  
+		        	content.children[0].style.left = -document.documentElement.clientWidth + 2*distance + 'px';
+		        	content.children[1].style.left = 2*distance + 'px'; 
+		        }
+
+		        line.className = 'u-line'; 
+		        content.children[0].className = "";
+		        content.children[1].className = "";
+
+		    }
 		}
 
 		function endTouchScroll(event)
-		{  
+		{   
+	        if( !isValid ){
+	        	isValid = undefined;    
+	        	return;
+	        }
+
 	        var distance = endX - startX;  
 	        var leftPos;
-	        var threshold = document.documentElement.clientWidth/4;
+	        var threshold = document.documentElement.clientWidth/8;
 	        if( distance>0 && activeTab == 1){ //向右滑, 从第二个tab滑到第一个tab
-	        	if( distance < threshold){ //滑的距离不够
+	        	if( Math.abs(endY - startY) > 10 && distance < threshold){ //滑的距离不够
 	        		leftPos = document.documentElement.clientWidth/2; 
 	        		content.children[1].style.left = "0";
 	        		content.children[0].style.left = "-100%";
@@ -157,8 +181,8 @@
 	        		activeTab = 0;
 	        	}
 	        }
-	        else if(  distance<0 && activeTab == 0){ //向左滑
-	        	if( distance > -1 * threshold){ //滑的距离不够
+	        else if( distance<0 && activeTab == 0){ //向左滑
+	        	if(  Math.abs(endY - startY) > 10 && distance > -1 * threshold){ //滑的距离不够
 	        		leftPos = 0;
 	        		content.children[0].style.left = "0";
 	        		content.children[1].style.left = "100%";
@@ -175,7 +199,8 @@
 	        line.className = 'u-line trans'; 
 			content.children[0].className = "trans";
 	        content.children[1].className = "trans";
-	        line.style.left = leftPos + 'px';     
+	        line.style.left = leftPos + 'px';  
+	        isValid = undefined;   
 		}
 
 	</script>

@@ -166,7 +166,7 @@
 	        var leftPos;
 	        var threshold = document.documentElement.clientWidth/8;
 	        if( distance>0 && activeTab == 1){ //向右滑, 从第二个tab滑到第一个tab
-	        	if( Math.abs(endY - startY) > 10 && distance < threshold){ //滑的距离不够
+	        	if( distance < threshold){ //滑的距离不够
 	        		leftPos = document.documentElement.clientWidth/2;
 	        		content.children[1].style.left = "0";
 	        		content.children[0].style.left = "-100%";
@@ -181,7 +181,7 @@
 	        	}
 	        }
 	        else if( distance<0 && activeTab == 0){ //向左滑
-	        	if(  Math.abs(endY - startY) > 10 && distance > -1 * threshold){ //滑的距离不够
+	        	if( distance > -1 * threshold){ //滑的距离不够
 	        		leftPos = 0;
 	        		content.children[0].style.left = "0";
 	        		content.children[1].style.left = "100%";

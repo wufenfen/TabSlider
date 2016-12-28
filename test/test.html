@@ -10,6 +10,10 @@
 			padding: 0;
 		}
 
+		body{
+			height: 1000px;
+		}
+
 		li {
 			font-size: 14px;
 			list-style: none;
@@ -24,7 +28,7 @@
 		}
 
 		.tabContainer li{ 
-			width: 33.33%;
+			width: 25%;
 			display: inline-block;
 			background: #dec0ff;
 			line-height: 50px;
@@ -38,6 +42,12 @@
 			transition: color 0.5s ease-in-out;
 		}
 
+		a:hover, a:link, a:visited{
+			text-decoration: none; 
+			color: black;
+			background: none;
+			-webkit-tap-highlight-color: transparent;
+		}
 		.active a{
 			color: yellow;
 		}
@@ -49,17 +59,28 @@
 			position: relative;
 		}
  
+ 		.content li{
+ 			padding: 30px;
+ 			width: 100%;
+ 		}
+
 		.line{
 			height: 3px;
 			background-color: #f0ff0a;
 			position: absolute;
 			bottom: 0;
-			width: 33.33%;
+			width: 25%;
 		} 
 
 		.trans{
 			transition: left 0.5s ease-in-out;
 		} 
+
+		::selection             { background: yellow; color:#333; }
+
+::-moz-selection    { background:yellow; color:#333; }
+
+::-webkit-selection { background:yellow; color:#333;}
 	</style>
 
 </head>
@@ -70,12 +91,14 @@
 				<li class="active"><a href="javascript:void(0)">tab1</a></li>
 				<li><a href="javascript:void(0)">tab2</a></li>
 				<li><a href="javascript:void(0)">...</a></li>
+				<li><a href="javascript:void(0)">...</a></li>
 			</ul>
 			<div class="line trans"></div>
 		</div> 
 		<ul class="content">
 			<li> content for tab1 </li>
 			<li> content for tab2 </li>
+			<li> ... </li>
 			<li> ... </li>
 		</ul> 
 	</div>

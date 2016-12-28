@@ -23,26 +23,19 @@
 	</div>
 
  * JS:
- * $(".tabSlider")({
- 		 
+ * $(".tabSlider").tabSlider({
+ 	tabs: '.tab', //tab元素
+	content: '.content', //内容元素
+    line: ".line",  //tab下划线元素
+	tabActiveClass: 'active', //当前激活tab样式
+	transClass:"trans" //过渡效果设置
 });
  */
 
 
 ; (function($,window,document,undefined){ //最后一个undefined, 防止undefined被重写
 	var tabSlider = function(ele, options){
-		var $tabs = $(options.tabs).children();
-		var $contents = $(options.content).children();
-		var $line = $(options.line);
-
-		var startY, endY, startX, endX;
-		var activeTabIndex; //被激活的tab索引
-		var isValid; //判断此次的滑动是否为水平滑动
-
-		var tabSliderNum = $contents.length; 
-		var tabWidth = ele.width(); //整个tab组件的宽度
-		var maxMoveDistance = tabWidth/tabSliderNum; //滑动过程中内容能移动的最大距离
-		var threshold = maxMoveDistance/2; //滑动距离超过threshold即可认为成功切换tab
+	
 		//初始化tab，设置当前激活的tab
 		function activeTab(myIndex, activeItem){
 			activeTabIndex = myIndex;
@@ -84,16 +77,7 @@
 					$(item).css('left', (index-activeTabIndex)*tabWidth + distance + 'px'); 
 				})
 			} 
-		} 
-		activeTab(0);//默认第一个是激活的tab
-
-		$(options.content).on("touchstart",  startTouchScroll);
-		$(options.content).on("touchmove", moveTouchScroll);
-		$(options.content).on("touchend",  endTouchScroll);
-		//点击也能成功切换tab
-		$tabs.on("click", function(event){ 
-			activeTab(-1, event.target);
-		})
+		}  
 
 		function startTouchScroll(event){
 			var touch = event.originalEvent.targetTouches[0];
@@ -125,7 +109,7 @@
 		}
 
 		function endTouchScroll(event){
-			 if( !isValid ){
+			if( !isValid ){
 	        	isValid = undefined;
 	        	return;
 	        }
@@ -142,6 +126,29 @@
 	        }
 	        isValid = undefined;
 		}
+
+		var $tabs = $(options.tabs).children();
+		var $contents = $(options.content).children();
+		var $line = $(options.line);
+
+		var startY, endY, startX, endX;
+		var activeTabIndex; //被激活的tab索引
+		var isValid; //判断此次的滑动是否为水平滑动
+
+		var tabSliderNum = $contents.length; //tab的个数
+		var tabWidth = ele.width(); //整个tab组件的宽度
+		var maxMoveDistance = tabWidth/tabSliderNum; //滑动过程中内容能移动的最大距离
+		var threshold = maxMoveDistance/2; //滑动距离超过threshold即可认为成功切换tab
+
+		activeTab(0);//默认第一个是激活的tab
+
+		$(options.content).on("touchstart",  startTouchScroll);
+		$(options.content).on("touchmove", moveTouchScroll);
+		$(options.content).on("touchend",  endTouchScroll);
+		//点击也能成功切换tab
+		$tabs.on("click", function(event){ 
+			activeTab(-1, event.target);
+		}) 
 	}
 
 

@@ -74,13 +74,7 @@
 
 		.trans{
 			transition: left 0.5s ease-in-out;
-		} 
-
-		::selection             { background: yellow; color:#333; }
-
-::-moz-selection    { background:yellow; color:#333; }
-
-::-webkit-selection { background:yellow; color:#333;}
+		}  
 	</style>
 
 </head>
@@ -107,7 +101,7 @@
 	<script>
 		$(function() {
 		    $(".tabSlider").tabSlider({
-		    	tabs: '.tab', //
+		    	tabs: '.tab', 	
 		    	content: '.content',
 		    	line: ".line",
 		    	tabActiveClass: 'active',

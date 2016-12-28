@@ -28,7 +28,8 @@
 	content: '.content', //内容元素
     line: ".line",  //tab下划线元素
 	tabActiveClass: 'active', //当前激活tab样式
-	transClass:"trans" //过渡效果设置
+	transClass:"trans", //过渡效果设置
+	mousetouch: true //是否支持鼠标事件
 });
  */
 
@@ -80,16 +81,24 @@
 		}  
 
 		function startTouchScroll(event){
-			var touch = event.originalEvent.targetTouches[0];
+			var touch;
+			if(event.type == "mousedown"){
+				if(options.mousetouch){ 
+					touch = event;
+					isMouseDown = true;
+				}
+				else{
+					return;
+				}
+			}
+			else{ 
+				touch = event.originalEvent.targetTouches[0];
+			} 
 	        startX = touch.pageX;
 	        startY = touch.pageY;
 		}
 
 		function moveTouchScroll(event){ 
-	        var touch = event.originalEvent.targetTouches[0];
-	        endX = touch.pageX;
-	        endY = touch.pageY;
-
 	        if(isValid == undefined){
 		        //滑动过程中只判断一次
 		        if( Math.abs((endY - startY)/(endX - startX)) > 1){
@@ -98,6 +107,22 @@
 		        	isValid = true;
 		        }
 	        }
+
+	        var touch;
+			if(event.type == "mousemove"){
+				if(options.mousetouch && isMouseDown){ 
+					touch = event;
+				}
+				else{
+					return;
+				}
+			}
+			else{ 
+				touch = event.originalEvent.targetTouches[0];
+			}  
+	        endX = touch.pageX;
+	        endY = touch.pageY;
+
 
 	        if( isValid ){
 	        	event.preventDefault();
@@ -109,10 +134,15 @@
 		}
 
 		function endTouchScroll(event){
+			isMouseDown = false;
 			if( !isValid ){
 	        	isValid = undefined;
 	        	return;
-	        }
+	        } 
+
+			if(event.type == "mouseup" && !options.mousetouch){
+				return;
+			} 
 
 	        var distance = endX - startX; 
 	        if( distance > threshold && activeTabIndex!=0){ //向右滑
@@ -134,6 +164,7 @@
 		var startY, endY, startX, endX;
 		var activeTabIndex; //被激活的tab索引
 		var isValid; //判断此次的滑动是否为水平滑动
+		var isMouseDown; //鼠标是否处于按下状态
 
 		var tabSliderNum = $contents.length; //tab的个数
 		var tabWidth = ele.width(); //整个tab组件的宽度
@@ -142,9 +173,9 @@
 
 		activeTab(0);//默认第一个是激活的tab
 
-		$(options.content).on("touchstart",  startTouchScroll);
-		$(options.content).on("touchmove", moveTouchScroll);
-		$(options.content).on("touchend",  endTouchScroll);
+		$(options.content).on("touchstart mousedown",  startTouchScroll);
+		$(options.content).on("touchmove mousemove", moveTouchScroll);
+		$(options.content).on("touchend mouseup",  endTouchScroll);
 		//点击也能成功切换tab
 		$tabs.on("click", function(event){ 
 			activeTab(-1, event.target);
@@ -158,9 +189,10 @@
 	    	content: '.content', //内容元素
 		    line: ".line",  //tab下划线元素
 	    	tabActiveClass: 'active', //当前激活tab样式
-	    	transClass:"trans" //过渡效果设置
+	    	transClass:"trans", //过渡效果设置
+			mousetouch: false //是否支持鼠标事件
 		};
-		options = $.extend({}, options, defaults);
+		options = $.extend({},defaults, options);
 		return new tabSlider(this, options);  
 	}
 

@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>tab slider Demo</title>
-	<meta charset="utf-8"> 
+	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<style>
 		*{
@@ -30,7 +30,7 @@
 			display: inline-block;
 			background: #dec0ff;
 			line-height: 50px;
-			text-align: center; 
+			text-align: center;
 			height: 53px;
 			box-sizing: border-box;
 		}
@@ -42,10 +42,10 @@
 
 		li.active a{
 			color: yellow;
-		} 
-		.content{ 
+		}
+		.content{
 			height: 600px;
-			width: 100%;  
+			width: 100%;
 			overflow: hidden;
 		}
 
@@ -55,7 +55,7 @@
 
 		.u-line{
 			height: 3px;
-			background-color: #f0ff0a;  
+			background-color: #f0ff0a;
 			position: absolute;
 			bottom: 0;
 			width: 50%;
@@ -67,7 +67,7 @@
 		}
 
 		.trans{
-			transition: left 0.5s ease-in-out;	
+			transition: left 0.5s ease-in-out;
 		}
 
 		#content1{
@@ -75,7 +75,7 @@
 			left: 0;
 		}
 		#content2{
-			background: #dcffdc; 
+			background: #dcffdc;
 			top: -100%;
     		left: 100%;
 		}
@@ -95,13 +95,12 @@
 			<section id="content2"> Impatient, lack of thinking, complain a lot, mean</section>
 		</div>
 	</div>
-
 	<script>
 		//冒泡
 		var tabs = document.getElementsByTagName("ul")[0];
 		var content = document.getElementsByClassName("content")[0];
 		var line = document.getElementsByClassName("u-line")[0];
- 		
+
 		content.addEventListener("touchstart",  startTouchScroll, false);
 		content.addEventListener("touchmove", moveTouchScroll, false);
 		content.addEventListener("touchend",  endTouchScroll, false);
@@ -110,7 +109,7 @@
 		var isValid; //判断此次的滑动是否为水平滑动
 
 		function startTouchScroll(event)
-		{  
+		{
 	        var touch = event.touches[0];
 	        startX = touch.pageX;
 	        startY = touch.pageY;
@@ -118,38 +117,38 @@
 
 		function moveTouchScroll(event)
 		{
-			
+
 	        var touch = event.touches[0];
 	        endX = touch.pageX;
-	        endY = touch.pageY;  
+	        endY = touch.pageY;
 
-	        if(isValid == undefined){ 
+	        if(isValid == undefined){
 		        //滑动过程中只判断一次
 		        if( Math.abs((endY - startY)/(endX - startX)) > 1){
-		        	isValid = false; 
+		        	isValid = false;
 		        }else{
-		        	isValid = true;  
+		        	isValid = true;
 		        }
-	        } 
+	        }
 
 	        if( isValid ){
 	        	event.preventDefault();
-		        
-		        var distance = endX - startX;  
+
+		        var distance = endX - startX;
 		        console.log(distance);
-		        if( activeTab == 0 && distance <0 && distance> -1*document.documentElement.clientWidth/2) {  
-			        	line.style.left = -1*distance + 'px'; 
+		        if( activeTab == 0 && distance <0 && distance> -1*document.documentElement.clientWidth/2) {
+			        	line.style.left = -1*distance + 'px';
 			        	content.children[0].style.left = 2*distance + 'px';
-			        	content.children[1].style.left = document.documentElement.clientWidth + 2*distance + 'px';  
-		        	 
+			        	content.children[1].style.left = document.documentElement.clientWidth + 2*distance + 'px';
+
 		        }
-		        else if( activeTab == 1 && distance > 0 && distance <document.documentElement.clientWidth/2){ 
-		        	line.style.left =  document.documentElement.clientWidth/2-1*distance + 'px';  
+		        else if( activeTab == 1 && distance > 0 && distance <document.documentElement.clientWidth/2){
+		        	line.style.left =  document.documentElement.clientWidth/2-1*distance + 'px';
 		        	content.children[0].style.left = -document.documentElement.clientWidth + 2*distance + 'px';
-		        	content.children[1].style.left = 2*distance + 'px'; 
+		        	content.children[1].style.left = 2*distance + 'px';
 		        }
 
-		        line.className = 'u-line'; 
+		        line.className = 'u-line';
 		        content.children[0].className = "";
 		        content.children[1].className = "";
 
@@ -157,18 +156,18 @@
 		}
 
 		function endTouchScroll(event)
-		{   
+		{
 	        if( !isValid ){
-	        	isValid = undefined;    
+	        	isValid = undefined;
 	        	return;
 	        }
 
-	        var distance = endX - startX;  
+	        var distance = endX - startX;
 	        var leftPos;
 	        var threshold = document.documentElement.clientWidth/8;
 	        if( distance>0 && activeTab == 1){ //向右滑, 从第二个tab滑到第一个tab
 	        	if( Math.abs(endY - startY) > 10 && distance < threshold){ //滑的距离不够
-	        		leftPos = document.documentElement.clientWidth/2; 
+	        		leftPos = document.documentElement.clientWidth/2;
 	        		content.children[1].style.left = "0";
 	        		content.children[0].style.left = "-100%";
 	        	}
@@ -191,18 +190,18 @@
 	        		leftPos = document.documentElement.clientWidth/2;
 	        		tabs.children[1].className = 'active';
 	        		tabs.children[0].className = '';
-	        		content.children[1].style.left = "0"; 
+	        		content.children[1].style.left = "0";
 	        		content.children[0].style.left = "-100%";
 	        		activeTab = 1;
 	        	}
-	        }   
-	        line.className = 'u-line trans'; 
+	        }
+	        line.className = 'u-line trans';
 			content.children[0].className = "trans";
 	        content.children[1].className = "trans";
-	        line.style.left = leftPos + 'px';  
-	        isValid = undefined;   
+	        line.style.left = leftPos + 'px';
+	        isValid = undefined;
 		}
 
 	</script>
 </body>
-</html> 
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>test for tab slider widget</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<style>	
+		*{
+			margin: 0;
+			padding: 0;
+		}
+
+		li {
+			font-size: 14px;
+			list-style: none;
+		}
+
+		.tabContainer{
+			position: relative;
+		}
+
+		.tabContainer ul{
+			font-size: 0;
+		}
+
+		.tabContainer li{ 
+			width: 33.33%;
+			display: inline-block;
+			background: #dec0ff;
+			line-height: 50px;
+			text-align: center;
+			height: 53px;
+			box-sizing: border-box;
+		}
+
+		a{
+			text-decoration: none;
+			transition: color 0.5s ease-in-out;
+		}
+
+		.active a{
+			color: yellow;
+		}
+
+		.content{
+			height: 600px;
+			width: 100%;
+			overflow: hidden;
+			position: relative;
+		}
+ 
+		.line{
+			height: 3px;
+			background-color: #f0ff0a;
+			position: absolute;
+			bottom: 0;
+			width: 33.33%;
+		} 
+
+		.trans{
+			transition: left 0.5s ease-in-out;
+		} 
+	</style>
+
+</head>
+<body>
+	<div class="tabSlider">
+		<div class="tabContainer">
+			<ul class="tab">
+				<li class="active"><a href="javascript:void(0)">tab1</a></li>
+				<li><a href="javascript:void(0)">tab2</a></li>
+				<li><a href="javascript:void(0)">...</a></li>
+			</ul>
+			<div class="line trans"></div>
+		</div> 
+		<ul class="content">
+			<li> content for tab1 </li>
+			<li> content for tab2 </li>
+			<li> ... </li>
+		</ul> 
+	</div>
+	<script src="../src/jquery.js"></script>
+	<script src="../src/jquery.tabSlider.js"></script>
+	<script>
+		$(function() {
+		    $(".tabSlider").tabSlider({
+		    	tabs: '.tab', //
+		    	content: '.content',
+		    	line: ".line",
+		    	tabActiveClass: 'active',
+		    	transClass:"trans"
+		    });
+		});
+	</script>
+</body>
+</html>

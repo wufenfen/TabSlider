@@ -35,57 +35,87 @@
 
 
 ; (function($,window,document,undefined){ //最后一个undefined, 防止undefined被重写
-	var tabSlider = function(ele, options){
-	
-		//初始化tab，设置当前激活的tab
-		function activeTab(myIndex, activeItem){
-			activeTabIndex = myIndex;
+	var tabSlider = function(ele, options){ 
+		this.options = options; 
+		this.$tabs = $(options.tabs).children();
+		this.$contents = $(options.content).children();
+		this.$line = $(options.line);
 
-			$tabs.each(function(index, item){
-				if((index ==  activeTabIndex) || (activeItem && (item == activeItem || activeItem.parentNode == item))){
-					$(item).addClass(options.tabActiveClass);
-					$line.addClass('trans');
-					$line.css('left', 100/tabSliderNum*(index) + '%');
-					activeTabIndex = index;
-					activeContent(activeTabIndex);  
+		this.startY, this.endY, this.startX, this.endX;
+		this.activeTabIndex; //被激活的tab索引
+		this.isValid; //判断此次的滑动是否为水平滑动
+		this.isMouseDown; //鼠标是否处于按下状态
+
+		this.tabSliderNum = this.$contents.length; //tab的个数
+		this.tabWidth = ele.width(); //整个tab组件的宽度
+		this.maxMoveDistance = this.tabWidth/this.tabSliderNum; //滑动过程中内容能移动的最大距离
+		this.threshold = this.maxMoveDistance/2; //滑动距离超过threshold即可认为成功切换tab
+
+		this.activeTab(0);//默认第一个是激活的tab
+
+		$(options.content).on("touchstart mousedown",  this.startTouchScroll.bind(this));
+		$(options.content).on("touchmove mousemove", this.moveTouchScroll.bind(this));
+		$(options.content).on("touchend mouseup",  this.endTouchScroll.bind(this));
+		//点击也能成功切换tab
+		var that = this;
+		this.$tabs.on("click", function(event){ 
+			that.activeTab(-1, event.target);
+		}) 
+	}
+
+	tabSlider.prototype = {
+		//初始化tab，设置当前激活的tab
+		activeTab: function(myIndex, activeItem){
+			this.activeTabIndex = myIndex;
+			var that = this;
+			this.$tabs.each(function(index, item){
+				if((index ==  that.activeTabIndex) || (activeItem && (item == activeItem || activeItem.parentNode == item))){
+					$(item).addClass(that.options.tabActiveClass);
+					that.$line.addClass('trans');
+					that.$line.css('left', 100/that.tabSliderNum*(index) + '%');
+					that.activeTabIndex = index;
+					that.activeContent(that.activeTabIndex);  
 				}
 				else{
-					$(item).removeClass(options.tabActiveClass); 
+					$(item).removeClass(that.options.tabActiveClass); 
 				}
 			})
-		}
+		},
 
 		//设置当前激活tab的内容
-		function activeContent(activeTabIndex){
-			if(activeTabIndex==undefined || activeTabIndex<0){
+		activeContent: function(activeTabIndex){
+			if(this.activeTabIndex==undefined || this.activeTabIndex<0){
 				return;
 			}
-			$contents.each(function(index, item){ 
+			var that = this;
+			this.$contents.each(function(index, item){ 
 				$(item).css('position', 'absolute');
 				$(item).addClass('trans');
-				$(item).css('left', 100*(index-activeTabIndex) + '%'); 
+				$(item).css('left', 100*(index-that.activeTabIndex) + '%'); 
 			})
-		}
+		},
 
-		function moveContent(distance){
+		moveContent: function(distance){
 			//向右滑，滑出左侧的tab,如果已经处于最左侧的tab，不会滑动;反之亦然
-			if( (distance>0 && distance<maxMoveDistance && activeTabIndex!=0) ||
-			(distance<0 && distance>-1*maxMoveDistance && activeTabIndex!=tabSliderNum-1)){		 			 
-				$line.removeClass('trans'); 
-				$line.css('left',  activeTabIndex/tabSliderNum*tabWidth-distance + 'px'); 
-				$contents.each(function(index, item){  
+			if( (distance>0 && distance<this.maxMoveDistance && this.activeTabIndex!=0) ||
+			(distance<0 && distance>-1*this.maxMoveDistance && this.activeTabIndex!=this.tabSliderNum-1)){		 			 
+				this.$line.removeClass('trans'); 
+				this.$line.css('left',  this.activeTabIndex/this.tabSliderNum*this.tabWidth-distance + 'px'); 
+				console.log(this.activeTabIndex/this.tabSliderNum*this.tabWidth-distance);
+				var that = this;
+				this.$contents.each(function(index, item){  
 					$(item).removeClass('trans');
-					$(item).css('left', (index-activeTabIndex)*tabWidth + distance + 'px'); 
+					$(item).css('left', (index-that.activeTabIndex)*that.tabWidth + distance + 'px'); 
 				})
 			} 
-		}  
+		},  
 
-		function startTouchScroll(event){
+		startTouchScroll: function(event){
 			var touch;
 			if(event.type == "mousedown"){
-				if(options.mousetouch){ 
+				if(this.options.mousetouch){ 
 					touch = event;
-					isMouseDown = true;
+					this.isMouseDown = true;
 				}
 				else{
 					return;
@@ -94,23 +124,23 @@
 			else{ 
 				touch = event.originalEvent.targetTouches[0];
 			} 
-	        startX = touch.pageX;
-	        startY = touch.pageY;
-		}
+	        this.startX = touch.pageX;
+	        this.startY = touch.pageY;
+		},
 
-		function moveTouchScroll(event){ 
-	        if(isValid == undefined){
+		moveTouchScroll: function(event){ 
+	        if(this.isValid == undefined){
 		        //滑动过程中只判断一次
-		        if( Math.abs((endY - startY)/(endX - startX)) > 1){
-		        	isValid = false;
+		        if( Math.abs((this.endY - this.startY)/(this.endX - this.startX)) > 1){
+		        	this.isValid = false;
 		        }else{
-		        	isValid = true;
+		        	this.isValid = true;
 		        }
 	        }
 
 	        var touch;
 			if(event.type == "mousemove"){
-				if(options.mousetouch && isMouseDown){ 
+				if(this.options.mousetouch && this.isMouseDown){ 
 					touch = event;
 				}
 				else{
@@ -120,66 +150,43 @@
 			else{ 
 				touch = event.originalEvent.targetTouches[0];
 			}  
-	        endX = touch.pageX;
-	        endY = touch.pageY;
+	        this.endX = touch.pageX;
+	        this.endY = touch.pageY;
 
 
-	        if( isValid ){
+	        if( this.isValid ){
 	        	event.preventDefault();
 
-		        var distance = endX - startX; 
+		        var distance = this.endX - this.startX; 
 		        //滑动内容
-		        moveContent(distance);
+		        this.moveContent(distance);
 		    }
-		}
+		},
 
-		function endTouchScroll(event){
-			isMouseDown = false;
-			if( !isValid ){
-	        	isValid = undefined;
+		endTouchScroll: function(event){
+			this.isMouseDown = false;
+			if( !this.isValid ){
+	        	this.isValid = undefined;
 	        	return;
 	        } 
 
-			if(event.type == "mouseup" && !options.mousetouch){
+			if(event.type == "mouseup" && !this.options.mousetouch){
 				return;
 			} 
 
-	        var distance = endX - startX; 
-	        if( distance > threshold && activeTabIndex!=0){ //向右滑
- 				activeTab(activeTabIndex-1);
+	        var distance = this.endX - this.startX; 
+	        if( distance > this.threshold && this.activeTabIndex!=0){ //向右滑
+ 				this.activeTab(this.activeTabIndex-1);
 	        }
-	        else if( distance < -1*threshold && activeTabIndex != tabSliderNum-1){ //向左滑
- 				activeTab(activeTabIndex+1); 
+	        else if( distance < -1*this.threshold && this.activeTabIndex != this.tabSliderNum-1){ //向左滑
+ 				this.activeTab(this.activeTabIndex+1); 
 	        } 
 	        else{
- 				activeTab(activeTabIndex); 
+ 				this.activeTab(this.activeTabIndex); 
 	        }
-	        isValid = undefined;
+	        this.isValid = undefined;
 		}
 
-		var $tabs = $(options.tabs).children();
-		var $contents = $(options.content).children();
-		var $line = $(options.line);
-
-		var startY, endY, startX, endX;
-		var activeTabIndex; //被激活的tab索引
-		var isValid; //判断此次的滑动是否为水平滑动
-		var isMouseDown; //鼠标是否处于按下状态
-
-		var tabSliderNum = $contents.length; //tab的个数
-		var tabWidth = ele.width(); //整个tab组件的宽度
-		var maxMoveDistance = tabWidth/tabSliderNum; //滑动过程中内容能移动的最大距离
-		var threshold = maxMoveDistance/2; //滑动距离超过threshold即可认为成功切换tab
-
-		activeTab(0);//默认第一个是激活的tab
-
-		$(options.content).on("touchstart mousedown",  startTouchScroll);
-		$(options.content).on("touchmove mousemove", moveTouchScroll);
-		$(options.content).on("touchend mouseup",  endTouchScroll);
-		//点击也能成功切换tab
-		$tabs.on("click", function(event){ 
-			activeTab(-1, event.target);
-		}) 
 	}
 
 
